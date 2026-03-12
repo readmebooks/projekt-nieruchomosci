@@ -1,19 +1,15 @@
-import requests
-import zipfile
 import os
 
-url = "https://f001.backblazebase.com/file/Backblaze-Hard-Drive-Data/data_Q1_2023.zip"
-cel = "data/raw/pobrane_dane.zip"
+# Ten skrypt dokumentuje pochodzenie danych o nieruchomościach (UK Price Paid Data)
+# Plik został pobrany ręcznie z: 
+# http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-complete.csv
 
-print("Pobieram dane (ok. 1.2 GB)... To potrwa chwilę, zaparz kawę.")
-r = requests.get(url, stream=True)
-with open(cel, 'wb') as f:
-    for chunk in r.iter_content(chunk_size=1024*1024):
-        f.write(chunk)
+file_path = "data/raw/pp-complete.csv"
 
-print("Rozpakowuję (z 1.2 GB zrobi się ok. 10.5 GB plików CSV)...")
-with zipfile.ZipFile(cel, 'r') as zip_ref:
-    zip_ref.extractall("data/raw/")
-
-os.remove(cel)
-print("Gotowe! Dane czekają w folderze data/raw")
+if os.path.exists(file_path):
+    size_gb = os.path.getsize(file_path) / (1024**3)
+    print(f"Dane o nieruchomościach są gotowe w folderze data/raw.")
+    print(f"Rozmiar pliku: {size_gb:.2f} GB")
+else:
+    print("BŁĄD: Nie znaleziono pliku pp-complete.csv w folderze data/raw/")
+    print("Pobierz go ręcznie i umieść w odpowiedniej lokalizacji.")
