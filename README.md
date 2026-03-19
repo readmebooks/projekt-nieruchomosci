@@ -1,42 +1,43 @@
-Dokumentacja projektu - UK Price Paid Data
-Opis projektu
+# Projekt ELT: Analiza Rynku Nieruchomości w UK
 
-Projekt realizuje proces przetwarzania danych transakcyjnych rynku nieruchomości w Wielkiej Brytanii (UK Price Paid Data). System został zaprojektowany w architekturze medalionowej (Bronze, Silver, Gold) z wykorzystaniem podejścia ELT (Extract, Load, Transform). Głównym celem było obsłużenie wolumenu danych przekraczającego 10 GB przy zachowaniu wysokiej wydajności przetwarzania.
+## Cel projektu
+Celem projektu jest analiza brytyjskiego rynku nieruchomości w celu identyfikacji najdroższych lokalizacji oraz zbadania płynności rynku (liczba transakcji) na dużym zbiorze danych (Big Data). System ma za zadanie automatycznie wyczyścić surowe dane, usunąć duplikaty i przygotować raporty średnich cen dla poszczególnych miast.
 
-Specyfikacja techniczna
+## Architektura Systemu (High-Level)
+Poniższy schemat przedstawia przepływ danych od źródła zewnętrznego (CSV), przez silnik DuckDB, aż po wynik końcowy.
 
--Silnik bazy danych: DuckDB (In-process OLAP)
+![Architektura High Level](docs/architektura_high_level.png)
 
--Środowisko: Python 3.14 / VS Code
+## Opis warstw (Architektura medalionowa)
 
--Kontrola wersji: Git (lokalnie)
+1. **Warstwa Bronze (Raw):** Zawiera surowe dane załadowane bezpośrednio z plików CSV. W celu przetestowania wydajności silnika oraz spełnienia wymogów projektowych, dane zostały zduplikowane (UNION ALL), co pozwoliło na pracę ze zbiorem o rozmiarze ~10.6 GB (62 mln rekordów).
+2. **Warstwa Silver (Cleaned):** Dane oczyszczone i zdeduplikowane. Przeprowadzono rzutowanie typów danych (CAST) oraz mapowanie technicznych nazw kolumn na czytelne nazwy biznesowe.
+3. **Warstwa Gold (Curated):** Tabela wynikowa zawierająca statystyki (średnia cena, liczba transakcji) w podziale na miasta.
 
--Wolumen danych: ~10.6 GB (62 000 000 rekordów w warstwie Bronze)
+## Struktura bazy danych (ERD)
+Poniższy diagram przedstawia strukturę tabel oraz procesy transformacji zachodzące między warstwami.
 
-Potok danych (Medallion Architecture)
+![Diagram ERD](docs/architektura_erd.png)
 
-1. Warstwa Bronze (Raw): Zawiera surowe dane załadowane bezpośrednio z plików CSV. W celu przetestowania wydajności silnika oraz spełnienia wymogów projektowych, dane zostały zduplikowane (UNION ALL), co pozwoliło na symulację pracy ze zbiorem o rozmiarze 10.6 GB.
+## Identyfikacja problemów z jakością danych
+W trakcie prac rozwiązano trzy kluczowe wyzwania:
+1. **Redundancja danych:** Rozwiązane poprzez zastosowanie klauzuli `DISTINCT` w warstwie Silver.
+2. **Niejawny schemat (brak nagłówków):** Rozwiązane poprzez jawne mapowanie indeksów technicznych na atrybuty logiczne.
+3. **Niespójność formatów dat:** Optymalizacja poprzez rzutowanie na natywny typ `DATE`.
 
-2. Warstwa Silver (Cleaned): Warstwa przetworzona, w której dokonano deduplikacji rekordów (eliminacja duplikatów z warstwy Bronze). Przeprowadzono rzutowanie typów danych (CAST) oraz mapowanie technicznych nazw kolumn na nazwy biznesowe.
+## Weryfikacja i wyniki
+Poniżej znajduje się podgląd tabel w bazie danych wygenerowany skryptem weryfikacyjnym:
 
-3. Warstwa Gold (Curated): Skondensowana tabela wynikowa zawierająca zagregowane statystyki (średnia cena, liczba transakcji) w podziale na miasta.
+![Podgląd tabel](docs/tabele.png)
 
-Identyfikacja problemów z jakością danych
+## Specyfikacja techniczna
+- **Silnik bazy danych:** DuckDB (In-process OLAP)
+- **Środowisko:** Python 3.14 / VS Code
+- **Kontrola wersji:** Git
 
-W trakcie prac zidentyfikowano trzy kluczowe wyzwania:
-
-1. Redundancja danych: Wynikająca z błędu zasilania lub specyfiki źródeł (zduplikowane wiersze). Rozwiązane poprzez zastosowanie klauzuli DISTINCT w procesie transformacji do warstwy Silver.
-
-2. Niejawny schemat (brak nagłówków): Pliki źródłowe nie posiadają nazw kolumn. Rozwiązane poprzez jawne mapowanie indeksów technicznych (column00-column14) na atrybuty logiczne w warstwie Silver.
-
-3. Niespójność formatów dat: Surowe daty zawierają niepotrzebne znaczniki czasowe (timestamp). Zoptymalizowano to poprzez przycięcie ciągów znaków i rzutowanie na natywny typ DATE.
-
-Instrukcja uruchomienia
-
-1. Zainstalować DuckDB: pip install duckdb.
-
-2. Umieścić plik pp-complete.csv w lokalizacji data/raw/.
-
-3. Uruchomić skrypt procesowy: python 02_elt_proces.py.
-
-4. Weryfikacja bazy: projekt tworzy plik nieruchomosci_uk.db z kompletem tabel.
+## Instrukcja uruchomienia
+1. Zainstalować DuckDB: `pip install duckdb`.
+2. Pobierz dane źródłowe (ok. 5.3 GB):
+   Uruchom skrypt: `python 01_pobieranie.py` (pobierze on plik `pp-complete.csv` z oficjalnych serwerów rządowych do folderu `data/raw/`).
+3. Uruchomić główny proces: `python 02_elt_proces.py`.
+4. (Opcjonalnie) Szybki podgląd tabel: `python 03_podglad.py`.

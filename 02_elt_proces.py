@@ -5,7 +5,7 @@ import os
 con = duckdb.connect('nieruchomosci_uk.db')
 
 print("--- ETAP 1: LOAD (Warstwa BRONZE) ---")
-print("Ładuję 10 GB danych (czytam plik dwa razy)... To może potrwać ok. 1-2 minuty.")
+print("Ładuję 10 GB danych (czytam plik dwa razy)")
 
 # Ładujemy dane dwa razy, by osiągnąć wymaganą wagę 10GB
 con.execute("""
@@ -19,7 +19,7 @@ count_bronze = con.execute("SELECT count(*) FROM bronze_sales").fetchone()[0]
 print(f"W warstwie BRONZE mamy: {count_bronze} rekordów (ok. 10.6 GB).")
 
 print("\n--- ETAP 2: TRANSFORM (Warstwa SILVER - Czyszczenie) ---")
-# Naprawa kolumn: DuckDB używa formatu column00, column01 itd.
+
 con.execute("""
     CREATE OR REPLACE TABLE silver_sales AS 
     SELECT DISTINCT 
