@@ -20,10 +20,10 @@ Poniższy diagram przedstawia strukturę tabel oraz procesy transformacji zachod
 ![Diagram ERD](docs/architektura_erd.png)
 
 ## Identyfikacja problemów z jakością danych
-W trakcie prac rozwiązano trzy kluczowe wyzwania:
-1. **Redundancja danych:** Rozwiązane poprzez zastosowanie klauzuli `DISTINCT` w warstwie Silver.
-2. **Niejawny schemat (brak nagłówków):** Rozwiązane poprzez jawne mapowanie indeksów technicznych na atrybuty logiczne.
-3. **Niespójność formatów dat:** Optymalizacja poprzez rzutowanie na natywny typ `DATE`.
+W trakcie prac można było zauważyć trzy kluczowe problemy:
+1. **Duplikaty:** Rozwiązane poprzez zastosowanie `DISTINCT` w warstwie Silver.
+2. **Brak nazw kolumn:** Rozwiązane poprzez nadanie nazw poszczególnych kolumn.
+3. **Niespójność formatów i typów dat:** Daty miały doklejone godziny (00:00), a ceny były traktowane jako zwykły tekst. Zamieniłam je na `DATE` i `INTEGER`.
 
 ## Weryfikacja i wyniki
 Poniżej znajduje się podgląd tabel w bazie danych wygenerowany skryptem weryfikacyjnym:
