@@ -1,0 +1,9 @@
+dbt_transformation:
+  outputs:
+    dev:
+      type: duckdb
+      path: nieruchomosci_uk.db
+      extensions:
+        - httpfs
+        - parquet
+  target: dev
