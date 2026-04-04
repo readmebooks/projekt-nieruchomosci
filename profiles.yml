@@ -1,9 +1,9 @@
 dbt_transformation:
+  target: dev
   outputs:
     dev:
       type: duckdb
-      path: nieruchomosci_uk.db
+      path: 'D:/.Dominika/Projekty informatyczne/projekt_nieruchomości/nieruchomosci_uk.db'
       extensions:
         - httpfs
         - parquet
-  target: dev
