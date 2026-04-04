@@ -1,13 +1,13 @@
 import duckdb
 import os
 
-# Połączenie z bazą
+# Establish connection to the local DuckDB database
 con = duckdb.connect('nieruchomosci_uk.db')
 
-print("--- ETAP 1: LOAD (Warstwa BRONZE) ---")
-print("Ładuję 10 GB danych (czytam plik dwa razy)")
+print("--- STAGE 1: DATA INGESTION (BRONZE LAYER) ---")
+print("Ingesting source data (simulating 10GB volume by dual-loading)")
 
-# Ładujemy dane dwa razy, by osiągnąć wymaganą wagę 10GB
+# Ingest raw data twice to reach the required 10GB target volume
 con.execute("""
     CREATE OR REPLACE TABLE bronze_sales AS 
     SELECT * FROM read_csv_auto('data/raw/pp-complete.csv', all_varchar=True)
@@ -16,10 +16,11 @@ con.execute("""
 """)
 
 count_bronze = con.execute("SELECT count(*) FROM bronze_sales").fetchone()[0]
-print(f"W warstwie BRONZE mamy: {count_bronze} rekordów (ok. 10.6 GB).")
+print(f"BRONZE layer initialized with: {count_bronze} records (~10.6 GB).")
 
-print("\n--- ETAP 2: TRANSFORM (Warstwa SILVER - Czyszczenie) ---")
+print("\n--- STAGE 2: DATA CLEANING & REFINEMENT (SILVER LAYER) ---")
 
+# Apply schema, cast data types, and remove duplicates
 con.execute("""
     CREATE OR REPLACE TABLE silver_sales AS 
     SELECT DISTINCT 
@@ -32,11 +33,10 @@ con.execute("""
     FROM bronze_sales
     WHERE CAST(column01 AS INTEGER) > 0;
 """)
-print("Warstwa SILVER gotowa (dane wyczyszczone i zdeduplikowane).")
+print("SILVER layer successfully processed (deduplicated and cleaned).")
 
-print("\n--- ETAP 3: TRANSFORM (Warstwa GOLD - Raport) ---")
-# Agregujemy dane: Średnia cena nieruchomości w miastach
-con.execute("""
+print("\n--- STAGE 3: DATA AGGREGATION & ANALYTICS (GOLD LAYER) ---")
+# Aggregate data: Calculate average property prices by city
     CREATE OR REPLACE TABLE gold_city_stats AS 
     SELECT 
         city,
@@ -47,8 +47,8 @@ con.execute("""
     HAVING total_sales > 1000
     ORDER BY avg_price DESC;
 """)
-print("Warstwa GOLD gotowa. Projekt zakończony sukcesem!")
+print("GOLD layer generated. Pipeline execution completed")
 
-# Pokazujemy 5 najdroższych miast w terminalu
-print("\nTop 5 najdroższych miast w UK (dane Gold):")
+# Display preview of the final analytical report
+print("\nFinal Report Preview: Top 5 UK cities by average property price (Gold Data):")
 con.sql("SELECT * FROM gold_city_stats LIMIT 5").show()

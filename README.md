@@ -41,3 +41,10 @@ Poniżej znajduje się podgląd tabel w bazie danych wygenerowany skryptem weryf
    Uruchom skrypt: `python 01_pobieranie.py` (pobierze on plik `pp-complete.csv` z oficjalnych serwerów rządowych do folderu `data/raw/`).
 3. Uruchomić główny proces: `python 02_elt_proces.py`.
 4. (Opcjonalnie) Szybki podgląd tabel: `python 03_podglad.py`.
+
+## English version
+Getting Started:
+1. Install dependencies: pip install duckdb
+2. Download source data (~5.3 GB): python 01_pobieranie.py
+3. Run the ELT pipeline: python 02_elt_proces.py
+4.(Optional) Preview results: python 03_podglad.py
