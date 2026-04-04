@@ -47,4 +47,44 @@ Getting Started:
 1. Install dependencies: pip install duckdb
 2. Download source data (~5.3 GB): python 01_pobieranie.py
 3. Run the ELT pipeline: python 02_elt_proces.py
-4.(Optional) Preview results: python 03_podglad.py
+4. (Optional) Preview results: python 03_podglad.py
+
+# Orkiestracja i Modern Data Stack (Faza 2)
+
+W drugiej fazie projektu wdrożono nowoczesną architekturę potoku danych (Data Pipeline) opartą na orkiestracji procesów oraz deklaratywnym podejściu do transformacji SQL.
+
+## Charakterystyka wdrożonych narzędzi
+- **Dagster (Orchestrator):** Zarządzanie cyklem życia danych, monitorowanie zależności (lineage) oraz automatyzacja procesów.
+- **dbt (Transformation Tool):** Narzędzie do modelowania danych w warstwie SQL, umożliwiające wersjonowanie logiki biznesowej i automatyczną dokumentację.
+- **DuckDB (Execution Engine):** Silnik analityczny odpowiedzialny za wydajne przetwarzanie danych wewnątrz bazy (In-process OLAP).
+
+## Architektura potoku danych (Lineage Diagram)
+Poniższy schemat przedstawia graf zależności między modelami dbt zarządzany przez orkiestratora Dagster. Zapewnia on przejrzystość przepływu danych od warstwy surowej (Silver Staging) do warstwy analitycznej (Gold).
+
+![Pipeline Lineage](docs/pipeline_architecture.png)
+
+## Warstwy transformacji dbt
+Logika biznesowa została przeniesiona do dbt i podzielona na dwa kluczowe etapy:
+1. **Model stg_uk_sales (Silver):** Odpowiedzialny za pobieranie partycjonowanych plików CSV z lokalnego systemu plików, rzutowanie typów danych oraz standaryzację nazw kolumn.
+2. **Model avg_price_by_city (Gold):** Model agregujący, wyliczający średnie ceny nieruchomości oraz liczbę transakcji w podziale na miasta i lata sprzedaży.
+
+## Idempotentność i utrzymanie systemu
+Zastosowane podejście gwarantuje pełną idempotentność procesów – każde ponowne uruchomienie materializacji w Dagsterze odświeża stan tabel bez ryzyka duplikacji danych. Dzięki zastosowaniu dbt, system jest łatwo skalowalny i przystosowany do pracy zespołowej (wersjonowanie kodu, modularność).
+
+## Instrukcja uruchomienia (Faza 2)
+1. Aktywacja środowiska wirtualnego: `.\venv\Scripts\activate`.
+2. Instalacja zależności: `pip install -r requirements.txt`.
+3. Uruchomienie interfejsu Dagster:
+   ```powershell
+   dagster dev -f orchestration/definitions.py
+
+4. Dostęp do interfejsu pod adresem http://localhost:3000. W zakładce Lineage należy wybrać opcję "Materialize all" w celu uruchomienia potoku.
+5. Weryfikacja końcowa za pomocą skryptu: python 04_dbt_final_check.py.
+
+## English version (Phase 2)
+1. Activate venv: .\venv\Scripts\activate
+2. Install dependencies: pip install -r requirements.txt
+3. Launch orchestrator: dagster dev -f orchestration/definitions.py
+4. Access UI at http://localhost:3000, navigate to Lineage and click "Materialize all".
+5. Run final verification: python 04_dbt_final_check.py
+    
