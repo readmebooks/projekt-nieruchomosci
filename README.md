@@ -68,6 +68,14 @@ Logika biznesowa została przeniesiona do dbt i podzielona na dwa kluczowe etapy
 1. **Model stg_uk_sales (Silver):** Odpowiedzialny za pobieranie partycjonowanych plików CSV z lokalnego systemu plików, rzutowanie typów danych oraz standaryzację nazw kolumn.
 2. **Model avg_price_by_city (Gold):** Model agregujący, wyliczający średnie ceny nieruchomości oraz liczbę transakcji w podziale na miasta i lata sprzedaży.
 
+## Podgląd wyników (Data Preview)
+Poniżej przedstawiono zrzut ekranu zawierający fragmenty wygenerowanych danych z obu kluczowych warstw systemu (Silver oraz Gold). Pozwala to na natychmiastową weryfikację poprawności transformacji, rzutowania typów oraz końcowych agregacji analitycznych.
+
+### Podgląd warstw Staging (stg_uk_sales) oraz Analytics (avg_price_by_city)
+Górna część tabeli prezentuje oczyszczone dane transakcyjne z poprawnie zmapowanymi nazwami kolumn. Dolna część przedstawia ostateczny raport średnich cen nieruchomości w podziale na miasta i lata sprzedaży.
+
+![Data Layers Preview](docs/data_layers_preview.png)
+
 ## Idempotentność i utrzymanie systemu
 Zastosowane podejście gwarantuje pełną idempotentność procesów – każde ponowne uruchomienie materializacji w Dagsterze odświeża stan tabel bez ryzyka duplikacji danych. Dzięki zastosowaniu dbt, system jest łatwo skalowalny i przystosowany do pracy zespołowej (wersjonowanie kodu, modularność).
 
