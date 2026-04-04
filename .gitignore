@@ -1,2 +1,9 @@
+venv/
 data/
-*.db
+nieruchomosci_uk.db
+dbt_transformation/target/
+dbt_transformation/logs/
+dbt_transformation/dbt_packages/
+.tmp_dagster_home_*/
+**/__pycache__/
+.user.yml
