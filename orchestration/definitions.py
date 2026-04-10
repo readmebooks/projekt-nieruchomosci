@@ -1,19 +1,13 @@
 import os
-from dagster import Definitions
-from dagster_dbt import DbtCliResource, dbt_assets
 from pathlib import Path
+from dagster import Definitions
+from dagster_dbt import DbtCliResource
 
-# Paths - automatically detect folders relative to this file
-# 1. Path to the folder containing dbt_project.yml
-DBT_PROJECT_DIR = Path(__file__).joinpath("..", "..", "dbt_transformation").resolve()
+# Importujemy nasz asset z nowego pliku
+from orchestration.assets.dbt_assets import uk_property_assets, DBT_PROJECT_DIR
 
-# 2. Path to the folder containing profiles.yml (main project directory)
+# Ścieżka do profiles.yml (root projektu)
 PROFILES_DIR = Path(__file__).joinpath("..", "..").resolve()
-
-@dbt_assets(manifest=DBT_PROJECT_DIR.joinpath("target", "manifest.json"))
-def uk_property_assets(context, dbt: DbtCliResource):
-    # The build command runs models, tests, and snapshots in one go
-    yield from dbt.cli(["build"], context=context).stream()
 
 defs = Definitions(
     assets=[uk_property_assets],

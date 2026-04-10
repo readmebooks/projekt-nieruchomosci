@@ -1,7 +1,7 @@
 import duckdb
 
 # Establish a read-only connection for database inspection
-con = duckdb.connect('nieruchomosci_uk.db', read_only=True)
+con = duckdb.connect('../nieruchomosci_uk.db', read_only=True)
 
 print("--- DATABASE SCHEMA: AVAILABLE TABLES ---")
 con.sql("SHOW TABLES").show()

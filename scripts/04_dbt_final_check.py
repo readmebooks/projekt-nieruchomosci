@@ -2,7 +2,7 @@ import duckdb
 
 # Establish a connection to the local DuckDB database
 # Using read_only=True to prevent accidental data modification during inspection
-con = duckdb.connect('nieruchomosci_uk.db', read_only=True)
+con = duckdb.connect('../nieruchomosci_uk.db', read_only=True)
 
 print("--- DBT MODELS: FINAL REFINED TABLES ---")
 # This shows all tables currently managed by dbt and Dagster

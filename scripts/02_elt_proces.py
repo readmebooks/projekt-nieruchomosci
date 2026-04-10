@@ -2,7 +2,7 @@ import duckdb
 import os
 
 # Establish connection to the local DuckDB database
-con = duckdb.connect('nieruchomosci_uk.db')
+con = duckdb.connect('../nieruchomosci_uk.db', read_only=True)
 
 print("--- STAGE 1: DATA INGESTION (BRONZE LAYER) ---")
 print("Ingesting source data (simulating 10GB volume by dual-loading)")
