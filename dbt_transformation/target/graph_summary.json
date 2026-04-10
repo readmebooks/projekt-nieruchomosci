@@ -1,0 +1,1 @@
+{"_invocation_id": "f7fb0d84-a674-4824-a98d-6272dbc8c01b", "linked": {"0": {"name": "model.dbt_transformation.avg_price_by_city", "type": "model"}, "1": {"name": "model.dbt_transformation.stg_uk_sales", "type": "model", "succ": [0]}}}

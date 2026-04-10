@@ -1,0 +1,1 @@
+{"_invocation_id": "e4d5cda2-354f-46c1-ac54-d7c25bc724df", "linked": {"0": {"name": "model.dbt_transformation.stg_uk_sales", "type": "model"}}, "with_test_edges": {"0": {"name": "model.dbt_transformation.stg_uk_sales", "type": "model"}}}

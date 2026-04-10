@@ -1,7 +1,6 @@
 venv/
 data/
 nieruchomosci_uk.db
-dbt_transformation/target/
 dbt_transformation/logs/
 dbt_transformation/dbt_packages/
 .tmp_dagster_home_*/
