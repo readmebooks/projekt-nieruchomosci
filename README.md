@@ -93,3 +93,32 @@ Zastosowane podejście gwarantuje pełną idempotentność procesów – każde 
 4. Access UI at http://localhost:3000, navigate to Lineage and click "Materialize all".
 5. Run final verification: `python 04_dbt_final_check.py`
     
+# Przetwarzanie strumieniowe i system kolejek (Faza 3)
+
+W trzeciej fazie projekt został rozbudowany o **architekturę hybrydową (Lambda)**, która pozwala na jednoczesne przetwarzanie dużych partii danych historycznych (Batch) oraz nowych transakcji spływających w czasie rzeczywistym (Streaming).
+
+## Nowoczesna Architektura Strumieniowa
+Wprowadzono system kolejkowania wiadomości, który oddziela źródło danych od bazy docelowej, zapewniając odporność systemu na awarie i skalowalność.
+
+![Streaming Architecture](docs/updated_architecture.png)
+
+## Mechanizm działania
+1. **Producer:** Skrypt `scripts/05_streaming_producer.py` czyta dane i wysyła je do tematu `uk_property_sales` w Redpandzie.
+2. **Sensor:** Dagster co 30 sekund sprawdza kolejkę. Jeśli znajdzie dane, uruchamia asset `raw_stream_ingestion`.
+3. **Storage:** Dane trafiają do tabeli `bronze_stream_sales` w DuckDB, skąd mogą być dalej przetwarzane przez modele dbt.
+
+## Instrukcja uruchomienia (Faza 3)
+1. Upewnij się, że **Docker Desktop** jest uruchomiony.
+2. Uruchom infrastrukturę Redpanda: `docker-compose up -d`.
+3. Aktywuj środowisko: `.\venv\Scripts\activate`.
+4. Uruchom symulator danych (Producer): `python scripts/05_streaming_producer.py`.
+5. W osobnym terminalu uruchom Dagstera: `dagster dev -f orchestration/definitions.py`.
+6. W interfejsie Dagstera (Automation) włącz sensor `redpanda_message_sensor`. Od tego momentu dane będą ładowane automatycznie.
+
+## English version (Phase 3)
+1. Ensure **Docker Desktop** is running.
+2. Start Redpanda infrastructure: `docker-compose up -d`.
+3. Activate venv: `.\venv\Scripts\activate`.
+4. Start the Data Simulator: `python scripts/05_streaming_producer.py`.
+5. In a separate terminal, launch Dagster: `dagster dev -f orchestration/definitions.py`.
+6. In the Dagster UI (Automation tab), toggle the `redpanda_message_sensor` to **On**. Data will now be ingested automatically.
